@@ -19,7 +19,7 @@ public class RaycastController : MonoBehaviour {
 	public float verticalRaySpacing;
 
 	[HideInInspector]
-	public BoxCollider2D collider;
+	public new BoxCollider2D collider; //added 'new' cuz unity told me to
 	public RaycastOrigins raycastOrigins;
 
 	public virtual void Awake() {
