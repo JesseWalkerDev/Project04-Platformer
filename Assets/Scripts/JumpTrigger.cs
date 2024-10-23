@@ -44,7 +44,14 @@ public class JumpTrigger : MonoBehaviour
 		*/
 		
 		//animator.SetBool("Active", active);
-		spriteRenderer.sprite = sprites[Mathf.FloorToInt((1f - animationValue) * sprites.Count)];
+		try
+		{
+		spriteRenderer.sprite = sprites[Mathf.Min((int)((1f - animationValue) * sprites.Count), 5)];
+		}
+		catch
+		{
+			Debug.Log("frame: " + Mathf.Min((int)((1f - animationValue) * sprites.Count), 5) + "t: " + Mathf.Min(timeSinceJump / maxInactiveTime, 1f));
+		}
 		spriteRenderer.transform.localPosition = jumpDirection * -1.5f * (1 - animationValue);
 	}
 

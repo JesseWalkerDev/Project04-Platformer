@@ -54,6 +54,8 @@
     "dotnet.preferCSharpExtension": true,
     "dotnet.defaultSolution": "Project04-Platformer.sln",
     "cSpell.words": [
-        "jumpables"
+        "jumpables",
+        "Mathf",
+        "rbody"
     ]
 }
