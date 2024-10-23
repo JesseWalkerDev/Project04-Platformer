@@ -9,7 +9,7 @@ public class JumpTrigger : MonoBehaviour
 	public float jumpStrength = 11f;
 	public float maxInactiveTime = 2f;
 	
-	private float timeSinceJump = 1f;
+	private float timeSinceJump;
 	private Vector2 jumpDirection;
 	
 	public bool active
@@ -29,8 +29,7 @@ public class JumpTrigger : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		//animator = GetComponent<Animator>();
-		//spriteRenderer = GetComponent<SpriteRenderer>();
+		timeSinceJump = maxInactiveTime;
 	}
 
 	// Update is called once per frame
