@@ -4,42 +4,62 @@ using UnityEngine;
 
 public class JumpTrigger : MonoBehaviour
 {
+	public SpriteRenderer spriteRenderer;
+	public List<Sprite> sprites = new();
+	public float jumpStrength = 11f;
 	public float maxInactiveTime = 2f;
-	public float timeSinceJump = 0f;
+	
+	private float timeSinceJump = 1f;
+	private Vector2 jumpDirection;
+	
 	public bool active
 	{
 		get { return timeSinceJump > maxInactiveTime;}
 	}
 	
-	public float jumpForce = 11f;
-
+	private float animationValue
+	{
+		get
+		{
+			float t = Mathf.Min(timeSinceJump / maxInactiveTime, 1f);
+			return 4 * (t - Mathf.Sqrt(t)) + 1;
+		}
+	}
+	
 	// Start is called before the first frame update
 	void Start()
 	{
-		
+		//animator = GetComponent<Animator>();
+		//spriteRenderer = GetComponent<SpriteRenderer>();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
 		timeSinceJump += Time.deltaTime;
+		/*
 		if (active)
-			GetComponent<SpriteRenderer>().color = Color.white;
+			spriteRenderer.color = Color.white;
 		else
-			GetComponent<SpriteRenderer>().color = Color.blue;
+			spriteRenderer.color = Color.blue;
+		*/
+		
+		//animator.SetBool("Active", active);
+		spriteRenderer.sprite = sprites[Mathf.FloorToInt((1f - animationValue) * sprites.Count)];
+		spriteRenderer.transform.localPosition = jumpDirection * -1.5f * (1 - animationValue);
 	}
 
 	public void Jump(PlayerController player)
 	{
 		timeSinceJump = 0f;
 		
-		Vector2 jumpDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+		jumpDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 		jumpDirection.Normalize();
-		jumpDirection *= 11f;
-		if (jumpDirection.y > -0.9f)
-			jumpDirection.y += 5f;
+		Vector2 jumpForce = jumpDirection * jumpStrength;
+		if (jumpForce.y > -0.9f)
+			jumpForce.y += 5f;
 		
 		Rigidbody2D rigidbody = player.GetComponent<Rigidbody2D>();
-		rigidbody.velocity = jumpDirection;
+		rigidbody.velocity = jumpForce;
 	}
 }
