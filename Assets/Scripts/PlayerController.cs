@@ -15,12 +15,14 @@ public class PlayerController : MonoBehaviour
 	public float acceleration = 13f;
 	public float topSpeed = 8f;
 	public float maxJumpTime = 0.2f;
+	public float maxBufferTime = 0.2f;
 	
 	private bool grounded = false;
 	private List<GameObject> jumpables = new();
 	private bool jumping = false;
 	private float jumpTime = 0f;
 	private Vector2 previousVelocity = Vector2.zero;
+	private float bufferTime = 0.0f;
 	
 	//TODO: Add a frozen mode that other objects can toggle (jump triggers will freeze the player for a few frames to give the player time to input a direction)
 	
@@ -37,23 +39,32 @@ public class PlayerController : MonoBehaviour
 		else
 			sprite.color = Color.white;
 		
-		if (Input.GetKeyDown(KeyCode.C))
+		// Activate jumpable
+		if (jumpables.Count > 0 & (Input.GetKeyDown(KeyCode.C) | bufferTime > 0f)) // Input can be buffered indefinitely
 		{
-			// Activate jumpable
-			if (jumpables.Count > 0)
-			{
-				JumpTrigger jumpTrigger = jumpables[0].GetComponent<JumpTrigger>();
-				if (jumpTrigger.active)
-					jumpTrigger.Jump(this);
-			}
-			// Start a jump
-			else if (grounded)
-			{
-				rbody.velocity = new Vector2(rbody.velocity.x, 10);
-				jumping = true;
-				jumpTime = 0f;
-			}
+			JumpTrigger jumpTrigger = jumpables[0].GetComponent<JumpTrigger>();
+			if (jumpTrigger.active)
+				jumpTrigger.Jump(this);
+				bufferTime = 0f;
 		}
+		// Start a jump
+		else if (grounded & (Input.GetKeyDown(KeyCode.C) | (bufferTime > 0f & bufferTime < maxBufferTime))) // Input can be buffered until maxBufferTime
+		{
+			rbody.velocity = new Vector2(rbody.velocity.x, 10);
+			jumping = true;
+			jumpTime = 0f;
+			bufferTime = 0f;
+		}
+		
+		// Begin a buffer
+		if (Input.GetKeyDown(KeyCode.C) | (bufferTime > 0f & bufferTime < maxBufferTime))
+			bufferTime += Time.deltaTime; // probably shouldn't do this
+		// Continue a buffer
+		else if (Input.GetKey(KeyCode.C) & bufferTime > 0f)
+			bufferTime += Time.deltaTime;
+		// End a buffer
+		if (Input.GetKeyUp(KeyCode.C))
+			bufferTime = 0f;
 	}
 	
 	void FixedUpdate()
@@ -67,10 +78,6 @@ public class PlayerController : MonoBehaviour
 		
 		// Gravity
 		rbody.AddForce(Vector2.down * 30);
-		
-		// End a jump
-		//if (Input.GetKeyUp(KeyCode.C))
-		//	jumping = false;
 		
 		// Jump
 		if (Input.GetKey(KeyCode.C))
@@ -153,7 +160,7 @@ public class PlayerController : MonoBehaviour
                 break;
             }
         }
-		// Bounce off ceiling
+		// Hit ceiling
 		if (ceilingHit)
 		{
 			jumping = false;
