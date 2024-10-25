@@ -31,30 +31,17 @@ public class JumpTrigger : MonoBehaviour
 	{
 		timeSinceJump = maxInactiveTime;
 	}
-
+	
 	// Update is called once per frame
 	void Update()
 	{
 		timeSinceJump += Time.deltaTime;
-		/*
-		if (active)
-			spriteRenderer.color = Color.white;
-		else
-			spriteRenderer.color = Color.blue;
-		*/
 		
-		//animator.SetBool("Active", active);
-		try
-		{
+		// Visually fling the bubble backwards and shrink it after use
 		spriteRenderer.sprite = sprites[Mathf.Min((int)((1f - animationValue) * sprites.Count), 5)];
-		}
-		catch
-		{
-			Debug.Log("frame: " + Mathf.Min((int)((1f - animationValue) * sprites.Count), 5) + "t: " + Mathf.Min(timeSinceJump / maxInactiveTime, 1f));
-		}
 		spriteRenderer.transform.localPosition = jumpDirection * -1.5f * (1 - animationValue);
 	}
-
+	
 	public void Jump(PlayerController player)
 	{
 		timeSinceJump = 0f;
