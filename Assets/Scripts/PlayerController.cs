@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
 	
 	[Range(0f, 1f)]
 	public float drag = 0.04f;
+	private float wallSlideDrag = 0.16f;
 	public float acceleration = 13f;
 	public float topSpeed = 8f;
 	public float maxJumpTime = 0.2f;
@@ -93,13 +94,19 @@ public class PlayerController : MonoBehaviour
 	
 	void FixedUpdate()
 	{
+		float horizontalInput = Input.GetAxisRaw("Horizontal");
+		
 		// Move
-		rbody.AddForce(new Vector2(Input.GetAxisRaw("Horizontal") * acceleration, 0));
+		rbody.AddForce(new Vector2(horizontalInput * acceleration, 0));
 		// Shouldn't be able to immediately move towards wall after wall jump time...
 		
 		// Drag
-		if (grounded & Input.GetAxisRaw("Horizontal") == 0f)
+		if (grounded & horizontalInput == 0f)
 			rbody.velocity = new Vector2(rbody.velocity.x * (1f - drag), rbody.velocity.y);
+		
+		// Wall slide drag
+		if (((wallSlidingLeft & horizontalInput < 0f) | (wallSlidingRight & horizontalInput > 0f)) & rbody.velocity.y < 0f)
+			rbody.velocity = new Vector2(rbody.velocity.x, rbody.velocity.y * (1f - wallSlideDrag));
 		
 		// Gravity
 		rbody.AddForce(Vector2.down * 30);
