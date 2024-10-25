@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,8 +10,8 @@ public class PlayerController : MonoBehaviour
 	
 	[Range(0f, 1f)]
 	public float drag = 0.04f;
-	private float wallSlideDrag = 0.16f;
-	public float acceleration = 13f;
+	public float wallSlideDrag = 0.16f;
+	public float acceleration = 0.1f;
 	public float topSpeed = 8f;
 	public float maxJumpTime = 0.2f;
 	public float maxBufferTime = 0.2f;
@@ -97,8 +96,16 @@ public class PlayerController : MonoBehaviour
 		float horizontalInput = Input.GetAxisRaw("Horizontal");
 		
 		// Move
-		rbody.AddForce(new Vector2(horizontalInput * acceleration, 0));
-		// Shouldn't be able to immediately move towards wall after wall jump time...
+		if (!(wallJumping & jumpTime < maxJumpTime)) // Cannot immediately move towards wall after wall jumping
+		{
+			float xVelocity = rbody.velocity.x;
+			float horizontalSpeed = Mathf.Clamp(
+				xVelocity + horizontalInput * acceleration,
+				Mathf.Min(xVelocity, -topSpeed),
+				Mathf.Max(xVelocity, topSpeed)
+			);
+			rbody.velocity = new Vector2(horizontalSpeed, rbody.velocity.y);
+		}
 		
 		// Drag
 		if (grounded & horizontalInput == 0f)
@@ -123,7 +130,10 @@ public class PlayerController : MonoBehaviour
 		}
 		// End a jump
 		else
+		{
 			jumping = false;
+			wallJumping = false;
+		}
 		
 		previousVelocity = rbody.velocity;
 	}
