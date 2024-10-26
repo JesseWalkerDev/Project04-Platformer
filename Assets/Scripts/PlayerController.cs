@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -23,8 +24,9 @@ public class PlayerController : MonoBehaviour
 	private List<GameObject> jumpables = new();
 	private bool jumping = false;
 	private float jumpTime = 0f;
-	private Vector2 previousVelocity = Vector2.zero;
 	private float bufferTime = 0f;
+	private Vector2 previousVelocity = Vector2.zero;
+	private Vector2 checkPoint;
 	
 	//TODO: Add a frozen mode that other objects can toggle (jump triggers will freeze the player for a few frames to give the player time to input a direction)
 	
@@ -32,6 +34,8 @@ public class PlayerController : MonoBehaviour
 	{
 		rbody = gameObject.GetComponent<Rigidbody2D>();
 		sprite = gameObject.GetComponent<SpriteRenderer>();
+		
+		checkPoint = transform.position;
 	}
 	
 	void Update()
@@ -178,8 +182,15 @@ public class PlayerController : MonoBehaviour
 	
 	void OnTriggerEnter2D(Collider2D collider)
 	{
+		// Come into contact with a jump trigger
 		if (collider.gameObject.layer == LayerMask.NameToLayer("Jumpable"))
 			jumpables.Add(collider.gameObject);
+		// Come into contact with a hazard
+		else if (collider.gameObject.layer == LayerMask.NameToLayer("Hazard"))
+		{
+			rbody.position = checkPoint;
+			rbody.velocity = Vector2.zero;
+		}
 	}
 	
 	void OnTriggerExit2D(Collider2D collider)
