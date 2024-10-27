@@ -48,12 +48,14 @@ public class PlayerController : MonoBehaviour
 	
 	void Update()
 	{
+		/*
 		if (wallSlidingLeft)
 			sprite.color = Color.cyan;
 		else if (wallSlidingRight)
 			sprite.color = Color.green;
 		else
 			sprite.color = Color.white;
+		*/
 		
 		// Begin a buffer
 		if (jumpInputDown | (bufferTime > 0f & bufferTime < maxBufferTime))
@@ -105,9 +107,10 @@ public class PlayerController : MonoBehaviour
 		// Update visuals
 		animator.SetFloat("xSpeed", Math.Abs(rbody.velocity.x));
 		animator.SetBool("grounded", grounded);
-		if (horizontalInput < 0f)
+		animator.SetBool("wallSliding", wallSlidingLeft | wallSlidingRight);
+		if (horizontalInput < 0f | wallSlidingLeft)
 			sprite.flipX = true;
-		else if (horizontalInput > 0f)
+		else if (horizontalInput > 0f | wallSlidingRight)
 			sprite.flipX = false;
 	}
 	
