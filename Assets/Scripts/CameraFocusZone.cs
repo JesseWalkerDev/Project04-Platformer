@@ -9,6 +9,7 @@ public class CameraFocusZone : MonoBehaviour
 	static public List<CameraFocusZone> allZones = new List<CameraFocusZone>();
 	
 	public Vector3 cameraFocusPoint;
+	public Vector3 playerRespawnPoint;
 	public BoxCollider2D boundingBox;
 	
 	/*
@@ -51,8 +52,9 @@ public class CameraFocusZoneEditor : Editor
 		Handles.color = color;
 		GUI.color = color;
 		
-		//Handles.Label(pos, t.cameraFocusPoint.ToString("F1"));
-		Quaternion _q = Quaternion.identity;
-		Handles.TransformHandle(ref t.cameraFocusPoint, ref _q);
+		Handles.Label(t.cameraFocusPoint, "cameraFocusPoint");
+		t.cameraFocusPoint = Handles.PositionHandle(t.cameraFocusPoint, Quaternion.identity);
+		Handles.Label(t.playerRespawnPoint, "playerRespawnPoint");
+		t.playerRespawnPoint =Handles.PositionHandle(t.playerRespawnPoint, Quaternion.identity);
 	}
 }

@@ -34,6 +34,9 @@ public class CameraFollow : MonoBehaviour
 				
 				vector.z = transform.position.z;
 				transform.position = vector;
+				
+				PlayerController player = target.gameObject.GetComponent<PlayerController>();
+				player.checkPoint = zone.playerRespawnPoint;
 			}
 		}
 		

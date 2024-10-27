@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
 	public float topSpeed = 8f;
 	public float maxJumpTime = 0.2f;
 	public float maxBufferTime = 0.2f;
+	[HideInInspector]
+	public Vector2 checkPoint;
 	
 	private bool grounded = false;
 	private bool wallSlidingLeft = false;
@@ -27,7 +29,11 @@ public class PlayerController : MonoBehaviour
 	private float jumpTime = 0f;
 	private float bufferTime = 0f;
 	private Vector2 previousVelocity = Vector2.zero;
-	private Vector2 checkPoint;
+	
+	private bool jumpInputDown { get {return Input.GetKeyDown(KeyCode.C) | Input.GetKeyDown(KeyCode.Space);} }
+	private bool jumpInput { get {return Input.GetKey(KeyCode.C) | Input.GetKey(KeyCode.Space);} }
+	private bool jumpInputUp { get {return Input.GetKeyUp(KeyCode.C) | Input.GetKeyUp(KeyCode.Space);} }
+	private float horizontalInput { get {return Input.GetAxisRaw("Horizontal");} }
 	
 	//TODO: Add a frozen mode that other objects can toggle (jump triggers will freeze the player for a few frames to give the player time to input a direction)
 	
@@ -50,18 +56,18 @@ public class PlayerController : MonoBehaviour
 			sprite.color = Color.white;
 		
 		// Begin a buffer
-		if (Input.GetKeyDown(KeyCode.C) | (bufferTime > 0f & bufferTime < maxBufferTime))
+		if (jumpInputDown | (bufferTime > 0f & bufferTime < maxBufferTime))
 			bufferTime += Time.deltaTime; // probably shouldn't do this
 		
 		// Activate jumpable
-		if (jumpables.Count > 0 & (Input.GetKeyDown(KeyCode.C) | bufferTime > 0f)) // Input can be buffered indefinitely
+		if (jumpables.Count > 0 & (jumpInputDown | bufferTime > 0f)) // Input can be buffered indefinitely
 		{
 			JumpTrigger jumpTrigger = jumpables[0].GetComponent<JumpTrigger>();
 			if (jumpTrigger.active)
 				jumpTrigger.Jump(this);
 				bufferTime = 0f;
 		}
-		else if (Input.GetKeyDown(KeyCode.C) | (bufferTime > 0f & bufferTime < maxBufferTime)) // Input can be buffered until maxBufferTime
+		else if (jumpInputDown | (bufferTime > 0f & bufferTime < maxBufferTime)) // Input can be buffered until maxBufferTime
 		{
 			// Start a jump
 			if (grounded | wallSlidingLeft | wallSlidingRight)
@@ -90,25 +96,23 @@ public class PlayerController : MonoBehaviour
 		}
 		
 		// Continue a buffer
-		if (Input.GetKey(KeyCode.C) & bufferTime > 0f)
+		if (jumpInput & bufferTime > 0f)
 			bufferTime += Time.deltaTime;
 		// End a buffer
-		if (Input.GetKeyUp(KeyCode.C))
+		if (jumpInputUp)
 			bufferTime = 0f;
 		
 		// Update visuals
 		animator.SetFloat("xSpeed", Math.Abs(rbody.velocity.x));
 		animator.SetBool("grounded", grounded);
-		if (Input.GetAxisRaw("Horizontal") < 0f)
+		if (horizontalInput < 0f)
 			sprite.flipX = true;
-		else if (Input.GetAxisRaw("Horizontal") > 0f)
+		else if (horizontalInput > 0f)
 			sprite.flipX = false;
 	}
 	
 	void FixedUpdate()
-	{
-		float horizontalInput = Input.GetAxisRaw("Horizontal");
-		
+	{	
 		// Move
 		if (!(wallJumping & jumpTime < maxJumpTime)) // Cannot immediately move towards wall after wall jumping
 		{
@@ -133,7 +137,7 @@ public class PlayerController : MonoBehaviour
 		rbody.AddForce(Vector2.down * 30);
 		
 		// Continue a jump
-		if (Input.GetKey(KeyCode.C))
+		if (jumpInput)
 		{
 			
 			if (jumping & jumpTime < maxJumpTime)
