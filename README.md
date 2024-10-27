@@ -14,6 +14,7 @@ Description
 * 'Jump Bubble' objects that the player can use to jump in 8 directions
 * Spike hazards
 * Moving spike hazards
+* Dust particles in the background
 
 ## References
 
