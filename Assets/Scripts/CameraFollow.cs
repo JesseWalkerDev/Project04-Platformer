@@ -5,10 +5,14 @@ using UnityEngine.UIElements.Experimental;
 
 public class CameraFollow : MonoBehaviour
 {
+	public static int checkPointCount = 0;
+	
 	public Transform target;
 	public Vector3 zoneTarget;
 	public float snappiness = 0.02f;
 	public float transitionLength = 0.5f;
+	
+	private List<CameraFocusZone> visitedZones = new();
 	
 	//private float transitionTime = 0.0f;
 	//private 
@@ -37,6 +41,12 @@ public class CameraFollow : MonoBehaviour
 				
 				PlayerController player = target.gameObject.GetComponent<PlayerController>();
 				player.checkPoint = zone.playerRespawnPoint;
+				
+				if (!visitedZones.Contains(zone))
+				{
+					checkPointCount ++;
+					visitedZones.Add(zone);
+				}
 			}
 		}
 		
