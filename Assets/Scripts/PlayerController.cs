@@ -6,8 +6,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-	Rigidbody2D rbody;
-	SpriteRenderer sprite;
+	public Rigidbody2D rbody;
+	public SpriteRenderer sprite;
+	public Animator animator;
 	
 	[Range(0f, 1f)]
 	public float drag = 0.04f;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour
 	{
 		rbody = gameObject.GetComponent<Rigidbody2D>();
 		sprite = gameObject.GetComponent<SpriteRenderer>();
+		animator = gameObject.GetComponent<Animator>();
 		
 		checkPoint = transform.position;
 	}
@@ -93,6 +95,14 @@ public class PlayerController : MonoBehaviour
 		// End a buffer
 		if (Input.GetKeyUp(KeyCode.C))
 			bufferTime = 0f;
+		
+		// Update visuals
+		animator.SetFloat("xSpeed", Math.Abs(rbody.velocity.x));
+		animator.SetBool("grounded", grounded);
+		if (Input.GetAxisRaw("Horizontal") < 0f)
+			sprite.flipX = true;
+		else if (Input.GetAxisRaw("Horizontal") > 0f)
+			sprite.flipX = false;
 	}
 	
 	void FixedUpdate()
